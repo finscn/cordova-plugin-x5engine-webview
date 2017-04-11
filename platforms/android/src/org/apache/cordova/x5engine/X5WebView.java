@@ -25,6 +25,7 @@ import android.view.KeyEvent;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
+import com.tencent.smtt.sdk.WebSettings;
 
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaWebView;

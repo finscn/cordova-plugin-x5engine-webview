@@ -29,8 +29,8 @@ import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
-// import android.webkit.ValueCallback;
-import com.tencent.smtt.sdk.ValueCallback;
+import android.webkit.ValueCallback;
+
 
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebSettings.LayoutAlgorithm;
@@ -303,7 +303,7 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
      * @since Cordova 6.0
      */
     public void evaluateJavascript(String js, ValueCallback<String> callback) {
-        webView.evaluateJavascript(js, callback);
+        webView.evaluateJavascript(js, (com.tencent.smtt.sdk.ValueCallback)callback);
     }
 
     /**

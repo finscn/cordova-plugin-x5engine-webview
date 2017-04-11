@@ -111,14 +111,6 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
         this.pluginManager = pluginManager;
         this.nativeToJsMessageQueue = nativeToJsMessageQueue;
 
-        CordovaPlugin activityDelegatePlugin = new CordovaPlugin() {
-            @Override
-            public void onResume(boolean multitasking) {
-                activityDelegate.onResume();
-            }
-        };
-        pluginManager.addService(new PluginEntry("XWalkActivityDelegate", activityDelegatePlugin));
-
         webView.init(this, cordova);
         initWebViewSettings();
 

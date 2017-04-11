@@ -294,6 +294,16 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
     }
 
     /**
+     * This API is used in Cordova-Android 6.0.0 override from
+     *
+     * CordovaWebViewEngine.java
+     * @since Cordova 6.0
+     */
+    public void evaluateJavascript(String js, ValueCallback<String> callback) {
+        webView.evaluateJavascript(js, callback);
+    }
+
+    /**
      * Go to previous page in history.  (We manage our own history)
      *
      * @return true if we went back, false if we are already at top

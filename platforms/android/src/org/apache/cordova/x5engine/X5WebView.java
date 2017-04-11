@@ -45,6 +45,9 @@ public class X5WebView extends WebView implements CordovaWebViewEngine.EngineVie
 
     public X5WebView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        
+        WebSettings webSetting = this.getSettings();
+        webSetting.setAllowFileAccess(true);
     }
 
     // Package visibility to enforce that only X5WebViewEngine should call this method.

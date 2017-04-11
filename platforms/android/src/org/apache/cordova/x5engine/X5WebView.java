@@ -25,7 +25,6 @@ import android.view.KeyEvent;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
-import com.tencent.smtt.sdk.WebSettings;
 
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaWebView;
@@ -46,9 +45,6 @@ public class X5WebView extends WebView implements CordovaWebViewEngine.EngineVie
 
     public X5WebView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        
-        WebSettings webSetting = this.getSettings();
-        webSetting.setAllowFileAccess(true);
     }
 
     // Package visibility to enforce that only X5WebViewEngine should call this method.

@@ -31,6 +31,9 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.ValueCallback;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebSettings.LayoutAlgorithm;
@@ -38,12 +41,14 @@ import com.tencent.smtt.sdk.WebView;
 
 import org.apache.cordova.CordovaBridge;
 import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaPreferences;
 import org.apache.cordova.CordovaResourceApi;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CordovaWebViewEngine;
 import org.apache.cordova.ICordovaCookieManager;
 import org.apache.cordova.NativeToJsMessageQueue;
+import org.apache.cordova.PluginEntry;
 import org.apache.cordova.PluginManager;
 
 import java.lang.reflect.InvocationTargetException;
@@ -63,7 +68,6 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
 
     protected final X5WebView webView;
     protected final X5CookieManager cookieManager;
-    protected CordovaPreferences preferences;
     protected CordovaBridge bridge;
     protected Client client;
     protected CordovaWebView parentWebView;
@@ -71,6 +75,7 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
     protected PluginManager pluginManager;
     protected CordovaResourceApi resourceApi;
     protected NativeToJsMessageQueue nativeToJsMessageQueue;
+    protected CordovaPreferences preferences;
     private BroadcastReceiver receiver;
 
     /** Used when created via reflection. */
@@ -105,11 +110,20 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
         this.resourceApi = resourceApi;
         this.pluginManager = pluginManager;
         this.nativeToJsMessageQueue = nativeToJsMessageQueue;
-        webView.init(this, cordova);
 
+        CordovaPlugin activityDelegatePlugin = new CordovaPlugin() {
+            @Override
+            public void onResume(boolean multitasking) {
+                activityDelegate.onResume();
+            }
+        };
+        pluginManager.addService(new PluginEntry("XWalkActivityDelegate", activityDelegatePlugin));
+
+        webView.init(this, cordova);
         initWebViewSettings();
 
-        nativeToJsMessageQueue.addBridgeMode(new NativeToJsMessageQueue.OnlineEventsBridgeMode(new NativeToJsMessageQueue.OnlineEventsBridgeMode.OnlineEventsBridgeModeDelegate() {
+        nativeToJsMessageQueue.addBridgeMode(new NativeToJsMessageQueue.OnlineEventsBridgeMode(
+                new NativeToJsMessageQueue.OnlineEventsBridgeMode.OnlineEventsBridgeModeDelegate() {
             @Override
             public void setNetworkAvailable(boolean value) {
                 webView.setNetworkAvailable(value);
@@ -119,6 +133,7 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
                 X5WebViewEngine.this.cordova.getActivity().runOnUiThread(r);
             }
         }));
+        nativeToJsMessageQueue.addBridgeMode(new NativeToJsMessageQueue.EvalBridgeMode(this, cordova));
         bridge = new CordovaBridge(pluginManager, nativeToJsMessageQueue);
         exposeJsInterface(webView, bridge);
     }
@@ -146,6 +161,7 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
         // Enable JavaScript
         final WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
+		settings.setAllowFileAccess(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
         settings.setLayoutAlgorithm(LayoutAlgorithm.NORMAL);
 
@@ -240,16 +256,6 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
         // end CB-1405
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private void enableRemoteDebugging() {
-        try {
-            WebView.setWebContentsDebuggingEnabled(true);
-        } catch (IllegalArgumentException e) {
-            Log.d(TAG, "You have one job! To turn on Remote Web Debugging! YOU HAVE FAILED! ");
-            e.printStackTrace();
-        }
-    }
-
     private static void exposeJsInterface(WebView webView, CordovaBridge bridge) {
         if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)) {
             Log.i(TAG, "Disabled addJavascriptInterface() bridge since Android version is old.");
@@ -261,6 +267,17 @@ public class X5WebViewEngine implements CordovaWebViewEngine {
         X5ExposedJsApi exposedJsApi = new X5ExposedJsApi(bridge);
         webView.addJavascriptInterface(exposedJsApi, "_cordovaNative");
     }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void enableRemoteDebugging() {
+        try {
+            WebView.setWebContentsDebuggingEnabled(true);
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, "You have one job! To turn on Remote Web Debugging! YOU HAVE FAILED! ");
+            e.printStackTrace();
+        }
+    }
+
 
 
     /**

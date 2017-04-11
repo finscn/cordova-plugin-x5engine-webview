@@ -8,7 +8,6 @@ import com.tencent.smtt.export.external.interfaces.ClientCertRequest;
 import java.security.cert.X509Certificate;
 import java.security.Principal;
 import java.security.PrivateKey;
-import java.util.Arrays;
 
 
 /**
@@ -80,6 +79,6 @@ public class X5CordovaClientCertRequest implements ICordovaClientCertRequest {
      */
     public void proceed(PrivateKey privateKey, X509Certificate[] chain)
     {
-        request.proceed(privateKey, Arrays.asList(chain));
+        request.proceed(privateKey, chain);
     }
 }

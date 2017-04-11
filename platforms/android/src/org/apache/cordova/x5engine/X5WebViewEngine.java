@@ -29,7 +29,8 @@ import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
-import android.webkit.ValueCallback;
+// import android.webkit.ValueCallback;
+import com.tencent.smtt.sdk.ValueCallback;
 
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebSettings.LayoutAlgorithm;
